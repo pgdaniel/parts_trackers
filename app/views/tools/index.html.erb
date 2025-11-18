@@ -1,16 +1,3 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "Toolbox" %>
 
-<% content_for :title, "Tools" %>
-
-<h1>Tools</h1>
-
-<div id="tools">
-  <% @tools.each do |tool| %>
-    <%= render tool %>
-    <p>
-      <%= link_to "Show this tool", tool %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New tool", new_tool_path %>
+<div data-controller="tools-app"></div>

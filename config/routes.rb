@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
-  resources :tools
+  # Cars SPA - single route, React Router handles internal navigation
+  get 'cars', to: 'cars#index'
+  get 'cars/*path', to: 'cars#index'  # Catch all sub-routes for React Router
+  
+  # Tools SPA - single route, React Router handles internal navigation
+  get 'tools', to: 'tools#index'
+  get 'tools/*path', to: 'tools#index'  # Catch all sub-routes for React Router
+  
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
