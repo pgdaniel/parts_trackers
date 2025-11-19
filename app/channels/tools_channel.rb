@@ -11,7 +11,7 @@ class ToolsChannel < ApplicationCable::Channel
     tools = Tool.all.order(created_at: :desc)
     transmit({
       action: 'tools_list',
-      tools: tools.as_json
+      tools: tools.map { |t| serialize_tool(t) }
     })
   end
 
@@ -19,9 +19,9 @@ class ToolsChannel < ApplicationCable::Channel
     tool = Tool.find(data['id'])
     transmit({
       action: 'tool_detail',
-      tool: tool.as_json
+      tool: serialize_tool(tool)
     })
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Tool not found'
@@ -32,7 +32,7 @@ class ToolsChannel < ApplicationCable::Channel
     tool = Tool.create!(data['tool'])
     ActionCable.server.broadcast("tools", {
       action: 'tool_created',
-      tool: tool.as_json
+      tool: serialize_tool(tool)
     })
   rescue => e
     transmit({
@@ -46,7 +46,7 @@ class ToolsChannel < ApplicationCable::Channel
     if tool.update(data['tool'])
       ActionCable.server.broadcast("tools", {
         action: 'tool_updated',
-        tool: tool.as_json
+        tool: serialize_tool(tool)
       })
     else
       transmit({
@@ -54,7 +54,7 @@ class ToolsChannel < ApplicationCable::Channel
         message: tool.errors.full_messages.join(', ')
       })
     end
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Tool not found'
@@ -68,10 +68,16 @@ class ToolsChannel < ApplicationCable::Channel
       action: 'tool_deleted',
       id: data['id']
     })
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Tool not found'
     })
+  end
+
+  private
+
+  def serialize_tool(tool)
+    tool.as_json.merge('id' => tool.id.to_s).except('_id')
   end
 end

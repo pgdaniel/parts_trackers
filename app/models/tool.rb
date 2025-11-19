@@ -3,7 +3,8 @@ class Tool
   include Mongoid::Timestamps
   
   field :name, type: String
-  field :size, type: String
+  field :status, type: String
+  field :location, type: String
   field :description, type: String
   
   # Validations

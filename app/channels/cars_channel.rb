@@ -11,7 +11,7 @@ class CarsChannel < ApplicationCable::Channel
     cars = Car.all.order(created_at: :desc)
     transmit({
       action: 'cars_list',
-      cars: cars.as_json
+      cars: cars.map { |c| serialize_car(c) }
     })
   end
 
@@ -19,9 +19,9 @@ class CarsChannel < ApplicationCable::Channel
     car = Car.find(data['id'])
     transmit({
       action: 'car_detail',
-      car: car.as_json
+      car: serialize_car(car)
     })
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Car not found'
@@ -32,7 +32,7 @@ class CarsChannel < ApplicationCable::Channel
     car = Car.create!(data['car'])
     ActionCable.server.broadcast("cars", {
       action: 'car_created',
-      car: car.as_json
+      car: serialize_car(car)
     })
   rescue => e
     transmit({
@@ -46,7 +46,7 @@ class CarsChannel < ApplicationCable::Channel
     if car.update(data['car'])
       ActionCable.server.broadcast("cars", {
         action: 'car_updated',
-        car: car.as_json
+        car: serialize_car(car)
       })
     else
       transmit({
@@ -54,7 +54,7 @@ class CarsChannel < ApplicationCable::Channel
         message: car.errors.full_messages.join(', ')
       })
     end
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Car not found'
@@ -68,10 +68,16 @@ class CarsChannel < ApplicationCable::Channel
       action: 'car_deleted',
       id: data['id']
     })
-  rescue ActiveRecord::RecordNotFound
+  rescue Mongoid::Errors::DocumentNotFound
     transmit({
       action: 'error',
       message: 'Car not found'
     })
+  end
+
+  private
+
+  def serialize_car(car)
+    car.as_json.merge('id' => car.id.to_s).except('_id')
   end
 end

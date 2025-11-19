@@ -9,20 +9,20 @@ export default function ToolEdit({ channel }) {
   const { tools, currentTool, loading } = useToolsStore()
 
   // Try to find the tool in the list first, or use currentTool
-  const tool = currentTool?.id === parseInt(id) 
+  const tool = currentTool?.id === id 
     ? currentTool 
-    : tools.find(t => t.id === parseInt(id))
+    : tools.find(t => t.id === id)
 
   useEffect(() => {
     // If we don't have the tool in our store, fetch it
     if (channel && id && !tool) {
-      channel.perform('fetch_tool', { id: parseInt(id) })
+      channel.perform('fetch_tool', { id: id })
     }
   }, [channel, id, tool])
 
   const handleSubmit = (formData) => {
     channel.perform('update_tool', { 
-      id: parseInt(id), 
+      id: id, 
       tool: formData 
     })
     // Navigation will happen when update is confirmed

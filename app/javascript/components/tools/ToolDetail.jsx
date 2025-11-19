@@ -8,20 +8,20 @@ export default function ToolDetail({ channel }) {
   const { tools, currentTool, loading } = useToolsStore()
 
   // Try to find the tool in the list first, or use currentTool
-  const tool = currentTool?.id === parseInt(id) 
+  const tool = currentTool?.id === id 
     ? currentTool 
-    : tools.find(t => t.id === parseInt(id))
+    : tools.find(t => t.id === id)
 
   useEffect(() => {
     // If we don't have the tool in our store, fetch it
     if (channel && id && !tool) {
-      channel.perform('fetch_tool', { id: parseInt(id) })
+      channel.perform('fetch_tool', { id: id })
     }
   }, [channel, id, tool])
 
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this tool?')) {
-      channel.perform('delete_tool', { id: parseInt(id) })
+      channel.perform('delete_tool', { id: id })
       navigate('/')
     }
   }

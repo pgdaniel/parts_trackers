@@ -10,19 +10,19 @@ export default function CarEdit({ channel }) {
 
   useEffect(() => {
     // Check if car is already in the cars array
-    const car = currentCar?.id === parseInt(id) ? currentCar : cars.find(c => c.id === parseInt(id))
+    const car = currentCar?.id === id ? currentCar : cars.find(c => c.id === id)
     
     if (car) {
       setCurrentCar(car)
     } else if (channel) {
       // Only fetch if not found in store
-      channel.perform('fetch_car', { id: parseInt(id) })
+      channel.perform('fetch_car', { id: id })
     }
   }, [id, channel, currentCar, cars, setCurrentCar])
 
   const handleSubmit = (formData) => {
     if (channel) {
-      channel.perform('update_car', { id: parseInt(id), car: formData })
+      channel.perform('update_car', { id: id, car: formData })
       navigate(`/${id}`)
     }
   }
