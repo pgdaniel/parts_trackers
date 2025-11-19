@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resource :session
+  resource :registration, only: [:new, :create]
+  resources :passwords, param: :token
   # Cars SPA - single route, React Router handles internal navigation
   get 'cars', to: 'cars#index'
   get 'cars/*path', to: 'cars#index'  # Catch all sub-routes for React Router
