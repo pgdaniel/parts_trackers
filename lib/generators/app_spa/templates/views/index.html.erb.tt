@@ -1,0 +1,1 @@
+<div data-controller="<%= file_name.pluralize %>-app"></div>

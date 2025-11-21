@@ -1,0 +1,39 @@
+module <%= class_name %>::Authentication
+  extend ActiveSupport::Concern
+
+  included do
+    before_action :require_<%= file_name %>_authentication
+    helper_method :<%= file_name %>_authenticated?, :current_<%= file_name %>_user
+  end
+
+  private
+
+  def <%= file_name %>_authenticated?
+    resume_<%= file_name %>_session
+  end
+
+  def require_<%= file_name %>_authentication
+    resume_<%= file_name %>_session || request_<%= file_name %>_authentication
+  end
+
+  def resume_<%= file_name %>_session
+    Current.<%= file_name %>_session ||= find_<%= file_name %>_session_by_cookie
+    Current.<%= file_name %>_user = Current.<%= file_name %>_session&.user
+  end
+
+  def find_<%= file_name %>_session_by_cookie
+    if cookies.signed[:<%= file_name %>_session_id]
+      <%= class_name %>Session.find(cookies.signed[:<%= file_name %>_session_id])
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    nil
+  end
+
+  def request_<%= file_name %>_authentication
+    redirect_to new_<%= file_name %>_session_path
+  end
+
+  def current_<%= file_name %>_user
+    Current.<%= file_name %>_user
+  end
+end

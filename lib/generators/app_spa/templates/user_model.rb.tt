@@ -1,0 +1,29 @@
+class <%= class_name %>User
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  
+  field :email_address, type: String
+  field :password_digest, type: String
+  
+  has_secure_password
+  
+  # Associations
+  has_many :sessions, class_name: '<%= class_name %>Session', dependent: :destroy
+  
+  # Normalizations
+  normalizes :email_address, with: ->(e) { e.strip.downcase }
+  
+  # Validations
+  validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :password, length: { minimum: 8 }, if: -> { password.present? }
+  
+  # Indexes
+  index({ email_address: 1 }, { unique: true })
+  
+  # Authentication
+  def self.authenticate_by(attributes)
+    email = attributes[:email_address]&.strip&.downcase
+    user = find_by(email_address: email)
+    user&.authenticate(attributes[:password]) ? user : nil
+  end
+end

@@ -1,0 +1,26 @@
+import React from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import <%= class_name %>Form from './<%= class_name %>Form'
+
+export default function <%= class_name %>New({ channel }) {
+  const navigate = useNavigate()
+
+  const handleSubmit = (formData) => {
+    channel.perform('create_<%= file_name %>', { <%= file_name %>: formData })
+    setTimeout(() => navigate('/'), 500)
+  }
+
+  return (
+    <div className="<%= file_name %>-new-container">
+      <div className="<%= file_name %>-new-nav">
+        <Link to="/" className="btn btn-secondary">← Cancel</Link>
+      </div>
+
+      <h1>New <%= class_name %></h1>
+      <<%= class_name %>Form 
+        onSubmit={handleSubmit}
+        submitLabel="Create <%= class_name %>"
+      />
+    </div>
+  )
+}

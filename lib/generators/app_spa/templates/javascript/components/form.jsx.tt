@@ -1,0 +1,70 @@
+import React, { useState } from 'react'
+
+export default function <%= class_name %>Form({ initialData = {}, onSubmit, submitLabel = "Submit" }) {
+  const [formData, setFormData] = useState({
+    <% parsed_attributes.each_with_index do |attr, index| -%>
+    <%= attr[:name] %>: initialData.<%= attr[:name] %> || ''<%= index < parsed_attributes.length - 1 ? ',' : '' %>
+    <% end -%>
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSubmit(formData)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="<%= file_name %>-form">
+      <% parsed_attributes.each do |attr| -%>
+      <div className="form-group">
+        <label htmlFor="<%= attr[:name] %>"><%= attr[:name].titleize %></label>
+        <% if attr[:type] == 'String' -%>
+        <<% if attr[:name].include?('description') %>textarea<% else %>input<% end %>
+          id="<%= attr[:name] %>"
+          name="<%= attr[:name] %>"
+          <% unless attr[:name].include?('description') %>type="text"<% end %>
+          value={formData.<%= attr[:name] %>}
+          onChange={handleChange}
+          <% if attr[:name] == 'name' %>required<% end %>
+          placeholder="Enter <%= attr[:name] %>"
+        <% if attr[:name].include?('description') %>/>><% else %>/><% end %>
+        <% elsif attr[:type] == 'Integer' -%>
+        <input
+          id="<%= attr[:name] %>"
+          name="<%= attr[:name] %>"
+          type="number"
+          value={formData.<%= attr[:name] %>}
+          onChange={handleChange}
+          placeholder="Enter <%= attr[:name] %>"
+        />
+        <% elsif attr[:type] == 'Boolean' -%>
+        <input
+          id="<%= attr[:name] %>"
+          name="<%= attr[:name] %>"
+          type="checkbox"
+          checked={formData.<%= attr[:name] %>}
+          onChange={(e) => setFormData(prev => ({ ...prev, <%= attr[:name] %>: e.target.checked }))}
+        />
+        <% else -%>
+        <input
+          id="<%= attr[:name] %>"
+          name="<%= attr[:name] %>"
+          type="text"
+          value={formData.<%= attr[:name] %>}
+          onChange={handleChange}
+          placeholder="Enter <%= attr[:name] %>"
+        />
+        <% end -%>
+      </div>
+      <% end -%>
+
+      <button type="submit" className="btn btn-primary">
+        {submitLabel}
+      </button>
+    </form>
+  )
+}

@@ -1,0 +1,79 @@
+import React, { useEffect } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { use<%= class_name.pluralize %>Store } from '../../stores/<%= file_name.pluralize %>Store'
+
+export default function <%= class_name %>Detail({ channel }) {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { <%= file_name.pluralize %>, current<%= class_name %>, loading } = use<%= class_name.pluralize %>Store()
+
+  const <%= file_name %> = current<%= class_name %>?.id === id 
+    ? current<%= class_name %> 
+    : <%= file_name.pluralize %>.find(item => item.id === id)
+
+  useEffect(() => {
+    if (channel && id && !<%= file_name %>) {
+      channel.perform('fetch_<%= file_name %>', { id: id })
+    }
+  }, [channel, id, <%= file_name %>])
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this <%= file_name %>?')) {
+      channel.perform('delete_<%= file_name %>', { id: id })
+      navigate('/')
+    }
+  }
+
+  if (loading && !<%= file_name %>) {
+    return <div className="loading">Loading <%= file_name %>...</div>
+  }
+
+  if (!<%= file_name %>) {
+    return <div className="loading"><%= class_name %> not found</div>
+  }
+
+  return (
+    <div className="<%= file_name %>-detail-container">
+      <div className="<%= file_name %>-detail-nav">
+        <Link to="/" className="btn btn-secondary">← Back</Link>
+      </div>
+
+      <div className="<%= file_name %>-detail">
+        <div className="<%= file_name %>-header">
+          <div>
+            <h1>{<%= file_name %>.name || '<%= class_name %>'}</h1>
+          </div>
+          <div className="<%= file_name %>-actions">
+            <Link to={`/${id}/edit`} className="btn btn-primary">
+              Edit
+            </Link>
+            <button onClick={handleDelete} className="btn btn-danger">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div className="<%= file_name %>-info">
+          <% parsed_attributes.each do |attr| -%>
+          {<%= file_name %>.<%= attr[:name] %> && (
+            <div className="info-row">
+              <strong><%= attr[:name].titleize %>:</strong>
+              <span>{<%= file_name %>.<%= attr[:name] %>}</span>
+            </div>
+          )}
+          <% end -%>
+
+          <div className="info-row">
+            <strong>Created:</strong>
+            <span>{new Date(<%= file_name %>.created_at).toLocaleDateString()}</span>
+          </div>
+
+          <div className="info-row">
+            <strong>Last Updated:</strong>
+            <span>{new Date(<%= file_name %>.updated_at).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,51 @@
+import React, { useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { use<%= class_name.pluralize %>Store } from '../../stores/<%= file_name.pluralize %>Store'
+import <%= class_name %>Form from './<%= class_name %>Form'
+
+export default function <%= class_name %>Edit({ channel }) {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { <%= file_name.pluralize %>, current<%= class_name %>, loading } = use<%= class_name.pluralize %>Store()
+
+  const <%= file_name %> = current<%= class_name %>?.id === id 
+    ? current<%= class_name %> 
+    : <%= file_name.pluralize %>.find(item => item.id === id)
+
+  useEffect(() => {
+    if (channel && id && !<%= file_name %>) {
+      channel.perform('fetch_<%= file_name %>', { id: id })
+    }
+  }, [channel, id, <%= file_name %>])
+
+  const handleSubmit = (formData) => {
+    channel.perform('update_<%= file_name %>', { 
+      id: id, 
+      <%= file_name %>: formData 
+    })
+    setTimeout(() => navigate(`/${id}`), 500)
+  }
+
+  if (loading && !<%= file_name %>) {
+    return <div className="loading">Loading <%= file_name %>...</div>
+  }
+
+  if (!<%= file_name %>) {
+    return <div className="loading"><%= class_name %> not found</div>
+  }
+
+  return (
+    <div className="<%= file_name %>-edit-container">
+      <div className="<%= file_name %>-edit-nav">
+        <Link to={`/${id}`} className="btn btn-secondary">← Cancel</Link>
+      </div>
+
+      <h1>Edit <%= class_name %></h1>
+      <<%= class_name %>Form 
+        initialData={<%= file_name %>} 
+        onSubmit={handleSubmit}
+        submitLabel="Save Changes"
+      />
+    </div>
+  )
+}

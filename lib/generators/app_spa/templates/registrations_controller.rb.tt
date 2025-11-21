@@ -1,0 +1,32 @@
+class <%= class_name %>::RegistrationsController < ApplicationController
+  allow_unauthenticated_access
+  rate_limit to: 5, within: 10.minutes, only: :create, with: -> { redirect_to new_<%= file_name %>_registration_path, alert: "Try again later." }
+
+  def new
+    @user = <%= class_name %>User.new
+  end
+
+  def create
+    @user = <%= class_name %>User.new(user_params)
+
+    if @user.save
+      start_new_<%= file_name %>_session_for @user
+      redirect_to <%= file_name.pluralize %>_path, notice: "Welcome! Your account has been created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:email_address, :password, :password_confirmation)
+  end
+  
+  def start_new_<%= file_name %>_session_for(user)
+    user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+      Current.<%= file_name %>_session = session
+      cookies.signed.permanent[:<%= file_name %>_session_id] = { value: session.id.to_s, httponly: true, same_site: :lax }
+    end
+  end
+end

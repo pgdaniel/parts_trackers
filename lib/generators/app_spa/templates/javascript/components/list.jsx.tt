@@ -1,0 +1,51 @@
+import React, { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { use<%= class_name.pluralize %>Store } from '../../stores/<%= file_name.pluralize %>Store'
+
+export default function <%= class_name %>List({ channel }) {
+  const { <%= file_name.pluralize %>, loading } = use<%= class_name.pluralize %>Store()
+
+  useEffect(() => {
+    if (channel) {
+      channel.perform('fetch_<%= file_name.pluralize %>')
+    }
+  }, [channel])
+
+  if (loading) {
+    return <div className="loading">Loading <%= file_name.pluralize %>...</div>
+  }
+
+  return (
+    <div className="<%= file_name.pluralize %>-list-container">
+      <div className="<%= file_name.pluralize %>-header">
+        <h1><%= class_name.pluralize %></h1>
+        <Link to="/new" className="btn btn-primary">
+          + Add <%= class_name %>
+        </Link>
+      </div>
+
+      {<%= file_name.pluralize %>.length === 0 ? (
+        <div className="empty-state">
+          <p>No <%= file_name.pluralize %> yet.</p>
+          <Link to="/new" className="btn btn-primary">Add your first <%= file_name %></Link>
+        </div>
+      ) : (
+        <div className="<%= file_name.pluralize %>-grid">
+          {<%= file_name.pluralize %>.map((<%= file_name %>) => (
+            <Link key={<%= file_name %>.id} to={`/${<%= file_name %>.id}`} className="<%= file_name %>-card">
+              <div className="<%= file_name %>-card-header">
+                <h3>{<%= file_name %>.name || '<%= class_name %>'}</h3>
+              </div>
+              <% parsed_attributes.each do |attr| -%>
+              <% next if attr[:name] == 'name' -%>
+              {<%= file_name %>.<%= attr[:name] %> && (
+                <p className="<%= file_name %>-<%= attr[:name] %>">{<%= file_name %>.<%= attr[:name] %>}</p>
+              )}
+              <% end -%>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

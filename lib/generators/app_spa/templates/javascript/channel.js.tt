@@ -1,0 +1,52 @@
+import consumer from "./consumer"
+import { use<%= class_name.pluralize %>Store } from '../stores/<%= file_name.pluralize %>Store'
+
+export function create<%= class_name.pluralize %>Channel() {
+  return consumer.subscriptions.create("<%= class_name.pluralize %>Channel", {
+    connected() {
+      console.log('Connected to <%= class_name.pluralize %>Channel')
+    },
+
+    disconnected() {
+      console.log('Disconnected from <%= class_name.pluralize %>Channel')
+    },
+
+    received(data) {
+      const store = use<%= class_name.pluralize %>Store.getState()
+      
+      console.log('<%= class_name.pluralize %>Channel received:', data)
+      
+      switch(data.action) {
+        case '<%= file_name.pluralize %>_list':
+          store.set<%= class_name.pluralize %>(data.<%= file_name.pluralize %>)
+          store.setLoading(false)
+          break
+          
+        case '<%= file_name %>_detail':
+          store.setCurrent<%= class_name %>(data.<%= file_name %>)
+          store.setLoading(false)
+          break
+          
+        case '<%= file_name %>_created':
+          store.add<%= class_name %>(data.<%= file_name %>)
+          break
+          
+        case '<%= file_name %>_updated':
+          store.update<%= class_name %>(data.<%= file_name %>.id, data.<%= file_name %>)
+          break
+          
+        case '<%= file_name %>_deleted':
+          store.remove<%= class_name %>(data.id)
+          break
+          
+        case 'error':
+          console.error('<%= class_name.pluralize %>Channel error:', data.message)
+          alert(data.message)
+          break
+          
+        default:
+          console.warn('Unknown action:', data.action)
+      }
+    }
+  })
+}

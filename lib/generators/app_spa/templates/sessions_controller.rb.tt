@@ -1,0 +1,35 @@
+class <%= class_name %>::SessionsController < ApplicationController
+  allow_unauthenticated_access only: %i[ new create ]
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_<%= file_name %>_session_path, alert: "Try again later." }
+
+  def new
+  end
+
+  def create
+    if user = <%= class_name %>User.authenticate_by(params.permit(:email_address, :password))
+      start_new_<%= file_name %>_session_for user
+      redirect_to <%= file_name.pluralize %>_path
+    else
+      redirect_to new_<%= file_name %>_session_path, alert: "Try another email address or password."
+    end
+  end
+
+  def destroy
+    terminate_<%= file_name %>_session
+    redirect_to new_<%= file_name %>_session_path, status: :see_other
+  end
+  
+  private
+  
+  def start_new_<%= file_name %>_session_for(user)
+    user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+      Current.<%= file_name %>_session = session
+      cookies.signed.permanent[:<%= file_name %>_session_id] = { value: session.id.to_s, httponly: true, same_site: :lax }
+    end
+  end
+  
+  def terminate_<%= file_name %>_session
+    Current.<%= file_name %>_session&.destroy
+    cookies.delete(:<%= file_name %>_session_id)
+  end
+end

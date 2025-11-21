@@ -1,0 +1,5 @@
+class <%= class_name.pluralize %>Controller < ApplicationController
+  def index
+    # Main SPA entry point - React Router handles all sub-routes
+  end
+end

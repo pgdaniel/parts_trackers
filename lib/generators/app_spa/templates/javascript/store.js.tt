@@ -1,0 +1,31 @@
+import { create } from 'zustand'
+
+export const use<%= class_name.pluralize %>Store = create((set) => ({
+  <%= file_name.pluralize %>: [],
+  current<%= class_name %>: null,
+  loading: false,
+  
+  set<%= class_name.pluralize %>: (<%= file_name.pluralize %>) => set({ <%= file_name.pluralize %> }),
+  
+  setCurrent<%= class_name %>: (<%= file_name %>) => set({ current<%= class_name %>: <%= file_name %> }),
+  
+  add<%= class_name %>: (<%= file_name %>) => set((state) => ({ 
+    <%= file_name.pluralize %>: [<%= file_name %>, ...state.<%= file_name.pluralize %>] 
+  })),
+  
+  update<%= class_name %>: (id, updates) => set((state) => ({
+    <%= file_name.pluralize %>: state.<%= file_name.pluralize %>.map(item => 
+      item.id === id ? { ...item, ...updates } : item
+    ),
+    current<%= class_name %>: state.current<%= class_name %>?.id === id 
+      ? { ...state.current<%= class_name %>, ...updates } 
+      : state.current<%= class_name %>
+  })),
+  
+  remove<%= class_name %>: (id) => set((state) => ({
+    <%= file_name.pluralize %>: state.<%= file_name.pluralize %>.filter(item => item.id !== id),
+    current<%= class_name %>: state.current<%= class_name %>?.id === id ? null : state.current<%= class_name %>
+  })),
+  
+  setLoading: (loading) => set({ loading })
+}))

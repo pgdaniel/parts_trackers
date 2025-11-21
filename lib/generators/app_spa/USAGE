@@ -1,0 +1,184 @@
+# App SPA Generator
+
+Generate a complete standalone SPA (Single Page Application) with MongoDB backend, React frontend, and app-specific authentication.
+
+## Usage
+
+```bash
+bin/rails generate app_spa NAME [field:type field:type] [options]
+```
+
+### Examples
+
+**Basic app with default fields:**
+```bash
+bin/rails generate app_spa inventory
+```
+
+**App with custom fields:**
+```bash
+bin/rails generate app_spa inventory name:string quantity:integer location:string description:string
+```
+
+**Skip route injection:**
+```bash
+bin/rails generate app_spa inventory --skip-routes
+```
+
+**Skip tests:**
+```bash
+bin/rails generate app_spa inventory --skip-tests
+```
+
+## What Gets Generated
+
+### Backend (Rails + MongoDB)
+- **Models:**
+  - `app/models/inventory.rb` - Main MongoDB document
+  - `app/models/inventory_user.rb` - App-specific user authentication
+  - `app/models/inventory_session.rb` - App-specific sessions
+
+- **Controllers:**
+  - `app/controllers/inventories_controller.rb` - Main SPA controller
+  - `app/controllers/inventory/sessions_controller.rb` - Login/logout
+  - `app/controllers/inventory/registrations_controller.rb` - Signup
+  - `app/controllers/concerns/inventory/authentication.rb` - Auth logic
+
+- **Channels:**
+  - `app/channels/inventories_channel.rb` - ActionCable for real-time CRUD
+
+- **Views:**
+  - `app/views/inventories/index.html.erb` - SPA entry point
+  - `app/views/inventory_sessions/new.html.erb` - Login page
+  - `app/views/inventory_registrations/new.html.erb` - Signup page
+
+### Frontend (React SPA)
+- **App:**
+  - `app/javascript/apps/InventoryApp.jsx` - Main app with React Router
+
+- **Components:**
+  - `app/javascript/components/inventories/InventoryList.jsx` - List view
+  - `app/javascript/components/inventories/InventoryDetail.jsx` - Detail view
+  - `app/javascript/components/inventories/InventoryNew.jsx` - Create form
+  - `app/javascript/components/inventories/InventoryEdit.jsx` - Edit form
+  - `app/javascript/components/inventories/InventoryForm.jsx` - Shared form
+
+- **Infrastructure:**
+  - `app/javascript/stores/inventoriesStore.js` - Zustand state management
+  - `app/javascript/channels/inventories_channel.js` - ActionCable consumer
+  - `app/javascript/controllers/inventories_app_controller.js` - Stimulus lifecycle
+
+- **Styles:**
+  - `app/assets/stylesheets/inventories.css` - App-specific styling
+
+### Tests
+- `test/models/inventory_test.rb`
+- `test/models/inventory_user_test.rb`
+- `test/controllers/inventories_controller_test.rb`
+- `test/channels/inventories_channel_test.rb`
+
+### Routes
+Automatically adds to `config/routes.rb`:
+```ruby
+namespace :inventory do
+  resource :session, only: [:new, :create, :destroy]
+  resource :registration, only: [:new, :create]
+end
+get 'inventories', to: 'inventories#index'
+get 'inventories/*path', to: 'inventories#index'
+```
+
+## Architecture
+
+### Hybrid SQL + MongoDB
+- **SQL (SQLite):** Admin users only (global authentication)
+- **MongoDB:** App-specific users and data (isolated per app)
+
+### Complete SPA Pattern
+- One Rails route loads the entire React application
+- React Router handles all internal navigation (no page reloads)
+- ActionCable provides real-time data synchronization
+- Zustand manages client-side state
+
+### App-Specific Authentication
+- Each generated app has its own user system
+- Users created for "inventory" can't access "tools" or "cars"
+- Admin users (SQL) can access all apps (optional override)
+
+## Field Types
+
+Supported field types:
+- `string` - Text fields (default)
+- `integer` - Numeric fields
+- `boolean` - Checkboxes
+- `text` - Textarea fields
+
+## After Generation
+
+1. **Start MongoDB** (if not running):
+   ```bash
+   mongod
+   ```
+
+2. **Restart Rails server:**
+   ```bash
+   bin/dev
+   ```
+
+3. **Create MongoDB indexes:**
+   ```bash
+   bin/rails db:mongoid:create_indexes
+   ```
+
+4. **Visit your new app:**
+   ```
+   http://localhost:3000/inventories
+   ```
+
+5. **Create an account:**
+   ```
+   http://localhost:3000/inventory/registration/new
+   ```
+
+## Customization
+
+### Adding Fields Later
+Edit `app/models/inventory.rb` and add fields:
+```ruby
+field :new_field, type: String
+```
+
+### Updating Components
+All React components are in `app/javascript/components/inventories/`
+
+### Styling
+Edit `app/assets/stylesheets/inventories.css`
+
+### Channel Actions
+Add custom actions in `app/channels/inventories_channel.rb`
+
+## Features
+
+✅ Complete CRUD operations
+✅ Real-time updates via ActionCable
+✅ App-specific authentication
+✅ Responsive design (mobile-friendly)
+✅ Form validation
+✅ Error handling
+✅ Purple gradient theme (matches auth pages)
+✅ MongoDB indexes for performance
+✅ User data scoping (automatic filtering by user_id)
+
+## Example: Product Catalog
+
+```bash
+bin/rails generate app_spa product name:string sku:string price:integer stock:integer description:string
+```
+
+This creates a complete product management system with:
+- Product listing and search
+- Product detail pages
+- Add/edit product forms
+- Real-time inventory updates
+- Separate user accounts
+- Mobile-responsive interface

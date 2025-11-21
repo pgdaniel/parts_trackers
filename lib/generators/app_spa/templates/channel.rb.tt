@@ -1,0 +1,83 @@
+class <%= class_name.pluralize %>Channel < ApplicationCable::Channel
+  def subscribed
+    stream_from "<%= file_name.pluralize %>"
+  end
+
+  def unsubscribed
+    # Any cleanup needed when channel is unsubscribed
+  end
+
+  def fetch_<%= file_name.pluralize %>
+    <%= file_name.pluralize %> = <%= class_name %>.all.order(created_at: :desc)
+    transmit({
+      action: '<%= file_name.pluralize %>_list',
+      <%= file_name.pluralize %>: <%= file_name.pluralize %>.map { |item| serialize_<%= file_name %>(item) }
+    })
+  end
+
+  def fetch_<%= file_name %>(data)
+    <%= file_name %> = <%= class_name %>.find(data['id'])
+    transmit({
+      action: '<%= file_name %>_detail',
+      <%= file_name %>: serialize_<%= file_name %>(<%= file_name %>)
+    })
+  rescue Mongoid::Errors::DocumentNotFound
+    transmit({
+      action: 'error',
+      message: '<%= class_name %> not found'
+    })
+  end
+
+  def create_<%= file_name %>(data)
+    <%= file_name %> = <%= class_name %>.create!(data['<%= file_name %>'])
+    ActionCable.server.broadcast("<%= file_name.pluralize %>", {
+      action: '<%= file_name %>_created',
+      <%= file_name %>: serialize_<%= file_name %>(<%= file_name %>)
+    })
+  rescue => e
+    transmit({
+      action: 'error',
+      message: e.message
+    })
+  end
+
+  def update_<%= file_name %>(data)
+    <%= file_name %> = <%= class_name %>.find(data['id'])
+    if <%= file_name %>.update(data['<%= file_name %>'])
+      ActionCable.server.broadcast("<%= file_name.pluralize %>", {
+        action: '<%= file_name %>_updated',
+        <%= file_name %>: serialize_<%= file_name %>(<%= file_name %>)
+      })
+    else
+      transmit({
+        action: 'error',
+        message: <%= file_name %>.errors.full_messages.join(', ')
+      })
+    end
+  rescue Mongoid::Errors::DocumentNotFound
+    transmit({
+      action: 'error',
+      message: '<%= class_name %> not found'
+    })
+  end
+
+  def delete_<%= file_name %>(data)
+    <%= file_name %> = <%= class_name %>.find(data['id'])
+    <%= file_name %>.destroy!
+    ActionCable.server.broadcast("<%= file_name.pluralize %>", {
+      action: '<%= file_name %>_deleted',
+      id: data['id']
+    })
+  rescue Mongoid::Errors::DocumentNotFound
+    transmit({
+      action: 'error',
+      message: '<%= class_name %> not found'
+    })
+  end
+
+  private
+
+  def serialize_<%= file_name %>(<%= file_name %>)
+    <%= file_name %>.as_json.merge('id' => <%= file_name %>.id.to_s).except('_id')
+  end
+end

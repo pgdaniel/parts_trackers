@@ -1,0 +1,8 @@
+require "test_helper"
+
+class <%= class_name.pluralize %>ControllerTest < ActionDispatch::IntegrationTest
+  test "should get index" do
+    get <%= file_name.pluralize %>_url
+    assert_response :success
+  end
+end

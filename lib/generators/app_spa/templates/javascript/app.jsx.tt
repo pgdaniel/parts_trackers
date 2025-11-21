@@ -1,0 +1,20 @@
+import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import <%= class_name %>List from '../components/<%= file_name.pluralize %>/<%= class_name %>List'
+import <%= class_name %>Detail from '../components/<%= file_name.pluralize %>/<%= class_name %>Detail'
+import <%= class_name %>New from '../components/<%= file_name.pluralize %>/<%= class_name %>New'
+import <%= class_name %>Edit from '../components/<%= file_name.pluralize %>/<%= class_name %>Edit'
+
+export default function <%= class_name %>App({ channel }) {
+  return (
+    <BrowserRouter basename="/<%= file_name.pluralize %>">
+      <Routes>
+        <Route path="/" element={<<%= class_name %>List channel={channel} />} />
+        <Route path="/new" element={<<%= class_name %>New channel={channel} />} />
+        <Route path="/:id" element={<<%= class_name %>Detail channel={channel} />} />
+        <Route path="/:id/edit" element={<<%= class_name %>Edit channel={channel} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}

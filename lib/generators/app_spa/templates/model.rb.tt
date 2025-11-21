@@ -1,0 +1,18 @@
+class <%= class_name %>
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  
+  <% parsed_attributes.each do |attr| -%>
+  field :<%= attr[:name] %>, type: <%= attr[:type] %>
+  <% end -%>
+  
+  # Validations
+  <% if parsed_attributes.any? { |a| a[:name] == 'name' } -%>
+  validates :name, presence: true
+  <% end -%>
+  
+  # Indexes for better query performance
+  <% if parsed_attributes.any? { |a| a[:name] == 'name' } -%>
+  index({ name: 1 })
+  <% end -%>
+end

@@ -1,0 +1,32 @@
+require "test_helper"
+
+class <%= class_name %>Test < ActiveSupport::TestCase
+  test "should create <%= file_name %> with valid attributes" do
+    <%= file_name %> = <%= class_name %>.new(
+      user_id: BSON::ObjectId.new<%= parsed_attributes.any? ? ',' : '' %>
+      <% parsed_attributes.each_with_index do |attr, index| -%>
+      <%= attr[:name] %>: <%= attr[:type] == 'String' ? "'Test #{attr[:name]}'" : (attr[:type] == 'Integer' ? '123' : 'true') %><%= index < parsed_attributes.length - 1 ? ',' : '' %>
+      <% end -%>
+    )
+    assert <%= file_name %>.valid?
+  end
+
+  test "should require user_id" do
+    <%= file_name %> = <%= class_name %>.new(<%= parsed_attributes.map { |a| "#{a[:name]}: '#{a[:name]}'" }.join(', ') %>)
+    assert_not <%= file_name %>.valid?
+    assert_includes <%= file_name %>.errors[:user_id], "can't be blank"
+  end
+
+  test "should scope by user" do
+    user1_id = BSON::ObjectId.new
+    user2_id = BSON::ObjectId.new
+    
+    <%= file_name %>1 = <%= class_name %>.create!(user_id: user1_id<%= parsed_attributes.any? ? ', ' : '' %><%= parsed_attributes.first ? "#{parsed_attributes.first[:name]}: 'Test 1'" : '' %>)
+    <%= file_name %>2 = <%= class_name %>.create!(user_id: user2_id<%= parsed_attributes.any? ? ', ' : '' %><%= parsed_attributes.first ? "#{parsed_attributes.first[:name]}: 'Test 2'" : '' %>)
+    
+    user1_<%= file_name.pluralize %> = <%= class_name %>.for_user(user1_id)
+    
+    assert_includes user1_<%= file_name.pluralize %>, <%= file_name %>1
+    assert_not_includes user1_<%= file_name.pluralize %>, <%= file_name %>2
+  end
+end

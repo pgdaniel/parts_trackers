@@ -1,0 +1,41 @@
+import { Controller } from "@hotwired/stimulus"
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import <%= class_name %>App from '../apps/<%= class_name %>App'
+import { create<%= class_name.pluralize %>Channel } from '../channels/<%= file_name.pluralize %>_channel'
+
+export default class extends Controller {
+  connect() {
+    this.root = createRoot(this.element)
+    this.setupChannel()
+  }
+  
+  disconnect() {
+    if (this.channel) {
+      this.channel.unsubscribe()
+    }
+    if (this.root) {
+      this.root.unmount()
+    }
+  }
+  
+  setupChannel() {
+    this.channel = create<%= class_name.pluralize %>Channel()
+    
+    // Wait for connection before rendering
+    const checkConnection = setInterval(() => {
+      if (this.channel.consumer.connection.isOpen()) {
+        clearInterval(checkConnection)
+        this.render()
+      }
+    }, 100)
+  }
+  
+  render() {
+    this.root.render(
+      <React.StrictMode>
+        <<%= class_name %>App channel={this.channel} />
+      </React.StrictMode>
+    )
+  }
+}

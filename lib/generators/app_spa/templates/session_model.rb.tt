@@ -1,0 +1,15 @@
+class <%= class_name %>Session
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  
+  field :user_id, type: BSON::ObjectId
+  field :ip_address, type: String
+  field :user_agent, type: String
+  
+  # Associations
+  belongs_to :user, class_name: '<%= class_name %>User', foreign_key: :user_id
+  
+  # Indexes
+  index({ user_id: 1 })
+  index({ created_at: 1 }, { expire_after_seconds: 2.weeks.to_i })
+end

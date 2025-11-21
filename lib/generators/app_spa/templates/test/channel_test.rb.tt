@@ -1,0 +1,37 @@
+require "test_helper"
+
+class <%= class_name.pluralize %>ChannelTest < ActionCable::Channel::TestCase
+  test "subscribes successfully when authenticated" do
+    # Setup authentication
+    user = <%= class_name %>User.create!(
+      email_address: "test@example.com",
+      password: "password123"
+    )
+    Current.<%= file_name %>_user = user
+
+    subscribe
+
+    assert subscription.confirmed?
+  end
+
+  test "fetches <%= file_name.pluralize %> list" do
+    user = <%= class_name %>User.create!(
+      email_address: "test@example.com",
+      password: "password123"
+    )
+    Current.<%= file_name %>_user = user
+
+    <%= file_name %> = <%= class_name %>.create!(
+      user_id: user.id<%= parsed_attributes.any? ? ',' : '' %>
+      <%= parsed_attributes.first ? "#{parsed_attributes.first[:name]}: 'Test #{parsed_attributes.first[:name]}'" : '' %>
+    )
+
+    subscribe
+    perform :fetch_<%= file_name.pluralize %>
+
+    assert_equal({ 
+      'action' => '<%= file_name.pluralize %>_list',
+      '<%= file_name.pluralize %>' => [<%= file_name %>.as_json.merge('id' => <%= file_name %>.id.to_s).except('_id', 'user_id')]
+    }, transmissions.last)
+  end
+end

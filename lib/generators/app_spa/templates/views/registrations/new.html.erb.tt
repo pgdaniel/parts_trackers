@@ -1,0 +1,46 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Create your <%= class_name %> account</h1>
+    
+    <%%= tag.div(flash[:alert], class: "flash-message flash-alert") if flash[:alert] %>
+    <%%= tag.div(flash[:notice], class: "flash-message flash-notice") if flash[:notice] %>
+
+    <%%= form_with model: @user, url: <%= file_name %>_registration_path do |form| %>
+      <%% if @user.errors.any? %>
+        <div class="error-list">
+          <h2><%%= pluralize(@user.errors.count, "error") %> prohibited this account from being saved:</h2>
+          <ul>
+            <%% @user.errors.each do |error| %>
+              <li><%%= error.full_message %></li>
+            <%% end %>
+          </ul>
+        </div>
+      <%% end %>
+
+      <div class="form-group">
+        <%%= form.label :email_address, "Email address" %>
+        <%%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com" %>
+      </div>
+
+      <div class="form-group">
+        <%%= form.label :password %>
+        <%%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Minimum 8 characters", maxlength: 72 %>
+      </div>
+
+      <div class="form-group">
+        <%%= form.label :password_confirmation, "Confirm password" %>
+        <%%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Re-enter your password", maxlength: 72 %>
+      </div>
+
+      <%%= form.submit "Create account", class: "btn-primary" %>
+    <%% end %>
+
+    <div class="auth-divider">
+      <span>or</span>
+    </div>
+
+    <div class="auth-links">
+      Already have an account? <%%= link_to "Sign in", new_<%= file_name %>_session_path %>
+    </div>
+  </div>
+</div>
