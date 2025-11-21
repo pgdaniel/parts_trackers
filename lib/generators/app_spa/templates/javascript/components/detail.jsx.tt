@@ -7,15 +7,15 @@ export default function <%= class_name %>Detail({ channel }) {
   const navigate = useNavigate()
   const { <%= file_name.pluralize %>, current<%= class_name %>, loading } = use<%= class_name.pluralize %>Store()
 
-  const <%= file_name %> = current<%= class_name %>?.id === id 
+  const <%= file_name.singularize %> = current<%= class_name %>?.id === id 
     ? current<%= class_name %> 
     : <%= file_name.pluralize %>.find(item => item.id === id)
 
   useEffect(() => {
-    if (channel && id && !<%= file_name %>) {
+    if (channel && id && !<%= file_name.singularize %>) {
       channel.perform('fetch_<%= file_name %>', { id: id })
     }
-  }, [channel, id, <%= file_name %>])
+  }, [channel, id, <%= file_name.singularize %>])
 
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this <%= file_name %>?')) {
@@ -24,11 +24,11 @@ export default function <%= class_name %>Detail({ channel }) {
     }
   }
 
-  if (loading && !<%= file_name %>) {
+  if (loading && !<%= file_name.singularize %>) {
     return <div className="loading">Loading <%= file_name %>...</div>
   }
 
-  if (!<%= file_name %>) {
+  if (!<%= file_name.singularize %>) {
     return <div className="loading"><%= class_name %> not found</div>
   }
 
@@ -41,7 +41,7 @@ export default function <%= class_name %>Detail({ channel }) {
       <div className="<%= file_name %>-detail">
         <div className="<%= file_name %>-header">
           <div>
-            <h1>{<%= file_name %>.name || '<%= class_name %>'}</h1>
+            <h1>{<%= file_name.singularize %>.name || '<%= class_name %>'}</h1>
           </div>
           <div className="<%= file_name %>-actions">
             <Link to={`/${id}/edit`} className="btn btn-primary">
@@ -55,22 +55,22 @@ export default function <%= class_name %>Detail({ channel }) {
 
         <div className="<%= file_name %>-info">
           <% parsed_attributes.each do |attr| -%>
-          {<%= file_name %>.<%= attr[:name] %> && (
+          {<%= file_name.singularize %>.<%= attr[:name] %> && (
             <div className="info-row">
               <strong><%= attr[:name].titleize %>:</strong>
-              <span>{<%= file_name %>.<%= attr[:name] %>}</span>
+              <span>{<%= file_name.singularize %>.<%= attr[:name] %>}</span>
             </div>
           )}
           <% end -%>
 
           <div className="info-row">
             <strong>Created:</strong>
-            <span>{new Date(<%= file_name %>.created_at).toLocaleDateString()}</span>
+            <span>{new Date(<%= file_name.singularize %>.created_at).toLocaleDateString()}</span>
           </div>
 
           <div className="info-row">
             <strong>Last Updated:</strong>
-            <span>{new Date(<%= file_name %>.updated_at).toLocaleDateString()}</span>
+            <span>{new Date(<%= file_name.singularize %>.updated_at).toLocaleDateString()}</span>
           </div>
         </div>
       </div>

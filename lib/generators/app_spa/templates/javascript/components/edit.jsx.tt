@@ -8,15 +8,15 @@ export default function <%= class_name %>Edit({ channel }) {
   const navigate = useNavigate()
   const { <%= file_name.pluralize %>, current<%= class_name %>, loading } = use<%= class_name.pluralize %>Store()
 
-  const <%= file_name %> = current<%= class_name %>?.id === id 
+  const <%= file_name.singularize %> = current<%= class_name %>?.id === id 
     ? current<%= class_name %> 
     : <%= file_name.pluralize %>.find(item => item.id === id)
 
   useEffect(() => {
-    if (channel && id && !<%= file_name %>) {
+    if (channel && id && !<%= file_name.singularize %>) {
       channel.perform('fetch_<%= file_name %>', { id: id })
     }
-  }, [channel, id, <%= file_name %>])
+  }, [channel, id, <%= file_name.singularize %>])
 
   const handleSubmit = (formData) => {
     channel.perform('update_<%= file_name %>', { 
@@ -26,11 +26,11 @@ export default function <%= class_name %>Edit({ channel }) {
     setTimeout(() => navigate(`/${id}`), 500)
   }
 
-  if (loading && !<%= file_name %>) {
+  if (loading && !<%= file_name.singularize %>) {
     return <div className="loading">Loading <%= file_name %>...</div>
   }
 
-  if (!<%= file_name %>) {
+  if (!<%= file_name.singularize %>) {
     return <div className="loading"><%= class_name %> not found</div>
   }
 
@@ -42,7 +42,7 @@ export default function <%= class_name %>Edit({ channel }) {
 
       <h1>Edit <%= class_name %></h1>
       <<%= class_name %>Form 
-        initialData={<%= file_name %>} 
+        initialData={<%= file_name.singularize %>} 
         onSubmit={handleSubmit}
         submitLabel="Save Changes"
       />
