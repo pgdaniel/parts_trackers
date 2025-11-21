@@ -9,6 +9,3 @@ application.register("hello", HelloController)
 
 import ToolsAppController from "./tools_app_controller"
 application.register("tools-app", ToolsAppController)
-
-import CarsAppController from "./cars_app_controller"
-application.register("cars-app", CarsAppController)
