@@ -10,8 +10,8 @@ class CreateApps < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    
+
     add_index :apps, :slug, unique: true
-    add_index :apps, [:user_id, :slug], unique: true
+    add_index :apps, [ :user_id, :slug ], unique: true
   end
 end

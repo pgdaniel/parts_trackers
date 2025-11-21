@@ -10,74 +10,74 @@ class ToolsChannel < ApplicationCable::Channel
   def fetch_tools
     tools = Tool.all.order(created_at: :desc)
     transmit({
-      action: 'tools_list',
+      action: "tools_list",
       tools: tools.map { |t| serialize_tool(t) }
     })
   end
 
   def fetch_tool(data)
-    tool = Tool.find(data['id'])
+    tool = Tool.find(data["id"])
     transmit({
-      action: 'tool_detail',
+      action: "tool_detail",
       tool: serialize_tool(tool)
     })
   rescue Mongoid::Errors::DocumentNotFound
     transmit({
-      action: 'error',
-      message: 'Tool not found'
+      action: "error",
+      message: "Tool not found"
     })
   end
 
   def create_tool(data)
-    tool = Tool.create!(data['tool'])
+    tool = Tool.create!(data["tool"])
     ActionCable.server.broadcast("tools", {
-      action: 'tool_created',
+      action: "tool_created",
       tool: serialize_tool(tool)
     })
   rescue => e
     transmit({
-      action: 'error',
+      action: "error",
       message: e.message
     })
   end
 
   def update_tool(data)
-    tool = Tool.find(data['id'])
-    if tool.update(data['tool'])
+    tool = Tool.find(data["id"])
+    if tool.update(data["tool"])
       ActionCable.server.broadcast("tools", {
-        action: 'tool_updated',
+        action: "tool_updated",
         tool: serialize_tool(tool)
       })
     else
       transmit({
-        action: 'error',
-        message: tool.errors.full_messages.join(', ')
+        action: "error",
+        message: tool.errors.full_messages.join(", ")
       })
     end
   rescue Mongoid::Errors::DocumentNotFound
     transmit({
-      action: 'error',
-      message: 'Tool not found'
+      action: "error",
+      message: "Tool not found"
     })
   end
 
   def delete_tool(data)
-    tool = Tool.find(data['id'])
+    tool = Tool.find(data["id"])
     tool.destroy!
     ActionCable.server.broadcast("tools", {
-      action: 'tool_deleted',
-      id: data['id']
+      action: "tool_deleted",
+      id: data["id"]
     })
   rescue Mongoid::Errors::DocumentNotFound
     transmit({
-      action: 'error',
-      message: 'Tool not found'
+      action: "error",
+      message: "Tool not found"
     })
   end
 
   private
 
   def serialize_tool(tool)
-    tool.as_json.merge('id' => tool.id.to_s).except('_id')
+    tool.as_json.merge("id" => tool.id.to_s).except("_id")
   end
 end
