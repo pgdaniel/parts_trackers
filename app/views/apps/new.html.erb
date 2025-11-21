@@ -1,0 +1,168 @@
+<div class="form-container">
+  <h1>Create New App</h1>
+  
+  <%= form_with model: @app, local: true, class: "app-form" do |f| %>
+    <% if @app.errors.any? %>
+      <div class="error-messages">
+        <h3><%= pluralize(@app.errors.count, "error") %> prohibited this app from being saved:</h3>
+        <ul>
+          <% @app.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= f.label :name, "App Name" %>
+      <%= f.text_field :name, placeholder: "e.g., Food Tracker", class: "form-control", autofocus: true %>
+      <small class="form-text">A friendly name for your app</small>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :slug, "URL Slug" %>
+      <%= f.text_field :slug, placeholder: "e.g., food_tracker", class: "form-control" %>
+      <small class="form-text">Lowercase letters, numbers, and underscores only. Leave blank to auto-generate from name.</small>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :description %>
+      <%= f.text_area :description, rows: 3, placeholder: "What does this app track?", class: "form-control" %>
+    </div>
+
+    <div class="form-section">
+      <h3>Fields</h3>
+      <div id="fields-container">
+        <div class="field-row">
+          <input type="text" name="fields[][name]" placeholder="Field name (e.g., name)" class="form-control" required>
+          <select name="fields[][type]" class="form-control" required>
+            <option value="string">String</option>
+            <option value="integer">Integer</option>
+            <option value="boolean">Boolean</option>
+            <option value="text">Text</option>
+          </select>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Remove</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addField()">+ Add Field</button>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "Create App", class: "btn btn-primary" %>
+      <%= link_to "Cancel", apps_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+function addField() {
+  const container = document.getElementById('fields-container');
+  const fieldRow = document.createElement('div');
+  fieldRow.className = 'field-row';
+  fieldRow.innerHTML = `
+    <input type="text" name="fields[][name]" placeholder="Field name" class="form-control" required>
+    <select name="fields[][type]" class="form-control" required>
+      <option value="string">String</option>
+      <option value="integer">Integer</option>
+      <option value="boolean">Boolean</option>
+      <option value="text">Text</option>
+    </select>
+    <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Remove</button>
+  `;
+  container.appendChild(fieldRow);
+}
+
+function removeField(button) {
+  button.closest('.field-row').remove();
+}
+</script>
+
+<style>
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.25rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-radius: 4px;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 150px 100px;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.error-messages {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.error-messages h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.error-messages ul {
+  margin-bottom: 0;
+}
+</style>

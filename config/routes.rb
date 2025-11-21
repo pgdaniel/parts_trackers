@@ -3,8 +3,16 @@ Rails.application.routes.draw do
   resource :registration, only: [:new, :create]
   resources :passwords, param: :token
   
+  # Apps Dashboard - manage user-created SPAs
+  resources :apps do
+    member do
+      post :generate
+      post :archive
+    end
+  end
+  
   # Root path
-  root "tools#index"
+  root "apps#index"
   
   # Cars SPA - single route, React Router handles internal navigation
   get 'cars', to: 'cars#index'
